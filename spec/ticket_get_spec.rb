@@ -18,5 +18,10 @@ describe 'TicketGet' do
     ticket = response.body[:ticket_get_response][:ticket]
     ticket.should include(:queue, :queue_id, :create_by)
   end
+
+  it "get returns some content" do
+    response = @ticket.get("TicketID" => ticket_get_id)
+    response[:ticket].should include(:queue, :title)
+  end
   
 end

@@ -11,8 +11,8 @@ describe 'TicketGet' do
               )
   end
 
-  it "ticket.get returns some content" do
-    response = @ticket.get("TicketID" => ticket_get_id)
+  it "ticket_get returns some content" do
+    response = @ticket.ticket_get("TicketID" => ticket_get_id)
     response.body.should include(:ticket_get_response)
     response.body[:ticket_get_response].should include(:ticket)
     ticket = response.body[:ticket_get_response][:ticket]

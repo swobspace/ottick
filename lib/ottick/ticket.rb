@@ -18,10 +18,28 @@ module Ottick
     end
 
     def get(options = {})
-      @client.call(:ticket_get, message: @otrs_credentials.merge(options))
+      response = ticket_get(options)
+      if response.success? || response.soap_fault?
+        response.body[:ticket_get_response]
+      else
+        response.http
+      end
     end
 
     def create(subject, text, options = {})
+      response = ticket_create(subject, text, options = {})
+      if response.success? || response.soap_fault?
+        response.body[:ticket_create_response]
+      else
+        response.http
+      end
+    end
+
+    def ticket_get(options = {})
+      @client.call(:ticket_get, message: @otrs_credentials.merge(options))
+    end
+
+    def ticket_create(subject, text, options = {})
       return if (subject.blank? || text.blank?)
       ticket = create_ticket_opts!(options)
       ticket.merge!("Title" => subject)

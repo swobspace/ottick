@@ -23,3 +23,4 @@ Ottick Copyright (C) 2014  Wolfgang Barth
 
 MIT License, see [LICENSE](LICENSE)
 
+This repository includes the file [GenericTicketConnector.wsdl](https://github.com/OTRS/otrs.git/development/webservices/GenericTicketConnector.wsdl) from OTRS licensed under the AFFERO GNU General Public License [AGPLv3](http://www.gnu.org/licenses/agpl-3.0.html)

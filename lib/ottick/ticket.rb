@@ -1,5 +1,6 @@
 require 'savon'
 require 'active_support/core_ext/object/blank'
+require 'active_support/core_ext/hash'
 
 module Ottick
   class Ticket
@@ -11,8 +12,13 @@ module Ottick
     #
     def initialize(options = {})
       sanitize_options!(options)
-      @options = default_options.merge(options)		# options wins
-      @client  = Savon.client(@options)
+      @otrs_credentials = otrs_credentials!(options)
+      @options          = default_options.merge(options)
+      @client           = Savon.client(@options)
+    end
+
+    def ticket_get(options = {})
+      @client.call(:ticket_get, message: @otrs_credentials.merge(options))
     end
 
     private
@@ -25,6 +31,14 @@ module Ottick
               "please use basic_auth: ['user', 'passwd'] instead of" +
               ":http_auth_user and http_auth_passwd"
       end
+    end
+
+    def otrs_credentials!(options)
+      otrs_cred = options.extract!(:otrs_user, :otrs_passwd)
+      {
+        "UserLogin" => otrs_cred.fetch(:otrs_user, Ottick.otrs_user),
+        "Password"  => otrs_cred.fetch(:otrs_passwd, Ottick.otrs_passwd)
+      }
     end
  
     def default_options

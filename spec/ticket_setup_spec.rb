@@ -30,5 +30,17 @@ describe 'TicketSetup' do
     expect(ticket.options).to include(:basic_auth)
     expect(ticket.options[:basic_auth]).to include("webservice", "very secret")
   end
+
+  it "options from Ticket.new with http_auth_* stuff should raise error" do
+    expect { Ottick::Ticket.new(http_auth_user: "xxx") }.to raise_error(RuntimeError)
+    expect { Ottick::Ticket.new(http_auth_passwd: "yyy") }.to raise_error(RuntimeError)
+  end
+
+  it "options from Ticket.new doesn't contain otrs_user and otrs_passwd" do
+    ticket = Ottick::Ticket.new(otrs_user: "zzz", otrs_passwd: "aaa")
+    expect(ticket.options).not_to include(:otrs_user)
+    expect(ticket.options).not_to include(:otrs_passwd)
+  end
+  
   
 end

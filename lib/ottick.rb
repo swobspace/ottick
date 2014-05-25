@@ -30,14 +30,14 @@ module Ottick
   # only neccessary if you use OTRS with http_authenication
   # must be a valid OTRS user with http_authentication
   #
-  mattr_accessor :http_auth_user, :http_auth_password
+  mattr_accessor :http_auth_user, :http_auth_passwd
   @@http_auth_user = nil
   @@http_auth_passwd = nil
 
   # UserLogin and Password for web service operations
   # if you use http_authentication, use a dummy string here (can't be left blank)
   # otherwise set credential for a valid OTRS user.
-  mattr_accessor :otrs_user, :otrs_password
+  mattr_accessor :otrs_user, :otrs_passwd
   @@otrs_user = nil
   @@otrs_passwd = nil
   

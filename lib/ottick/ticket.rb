@@ -17,8 +17,20 @@ module Ottick
       @client           = Savon.client(@options)
     end
 
-    def ticket_get(options = {})
+    def get(options = {})
       @client.call(:ticket_get, message: @otrs_credentials.merge(options))
+    end
+
+    def create(subject, text, options = {})
+      return if (subject.blank? || text.blank?)
+      ticket = create_ticket_opts!(options)
+      ticket.merge!("Title" => subject)
+      article = create_article_opts!(options)
+      article.merge!("Subject" => subject).merge!("Body" => text)
+
+      @client.call(:ticket_create, 
+                    message: @otrs_credentials.merge("Ticket" => ticket).
+		             merge("Article" => article).merge(options))
     end
 
     private
@@ -59,6 +71,49 @@ module Ottick
         {}
       else
         { basic_auth: [Ottick.http_auth_user, Ottick.http_auth_passwd] }
+      end
+    end
+
+    def create_ticket_opts!(options)
+      ticket_opts = options.extract!("Ticket")
+      sanitize_ticket_opts!(ticket_opts)
+      { 
+	"Queue"	=> Ottick.ticket_queue,
+	"State"	=> Ottick.ticket_state,
+	"Type"	=> Ottick.ticket_type,
+	"Priority" => Ottick.ticket_priority,
+	"CustomerUser" => Ottick.customer_user
+      }.merge(ticket_opts)
+    end
+
+    def create_article_opts!(options)
+      article_opts = options.extract!("Article")
+      sanitize_article_opts!(article_opts)
+      {
+	"SenderType" => Ottick.article_sender_type,
+	"Charset"    => Ottick.article_charset,
+	"MimeType"   => Ottick.article_mime_type
+      }.merge(article_opts)
+    end
+
+    def sanitize_ticket_opts!(opts)
+      if opts.has_key?("QueueID")
+        raise RuntimeError, "Please use Queue instead of QueueID"
+      end
+      if opts.has_key?("StateID")
+        raise RuntimeError, "Please use State instead of StateID"
+      end
+      if opts.has_key?("PriorityID")
+        raise RuntimeError, "Please use Priority instead of PriorityID"
+      end
+      if opts.has_key?("TypeID")
+        raise RuntimeError, "Please use Type instead of TypeID"
+      end
+    end
+
+    def sanitize_article_opts!(opts)
+      if opts.has_key?("SenderTypeID")
+        raise RuntimeError, "Please use Type instead of TypeID"
       end
     end
   end

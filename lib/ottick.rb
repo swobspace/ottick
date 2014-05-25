@@ -43,11 +43,13 @@ module Ottick
   
   # Ticket default settings
   #
-  mattr_accessor :ticket_type, :ticket_priority, :ticket_state, :ticket_queue
+  mattr_accessor :ticket_type, :ticket_priority, :ticket_state, :ticket_queue,
+                 :customer_user
   @@ticket_queue    = "Raw"
-  @@ticket_priority = "normal"
+  @@ticket_priority = "3 normal"
   @@ticket_state    = "new"
   @@ticket_type     = "default"
+  @@customer_user   = "test@localhost.local"
 
   # Article default settings
   #

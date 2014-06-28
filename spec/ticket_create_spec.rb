@@ -2,30 +2,49 @@ require 'spec_helper'
 require_relative './support/variables.rb'
 
 # -- run this example with rspec -t modify
-describe 'TicketCreate', modify: true do
-  include_context "basic variables"
+describe 'TicketCreate' do
+  describe "with valid settings", modify: true do
+    include_context "basic variables"
 
-  before(:each) do
-    @ticket = Ottick::Ticket.new({ 
-                wsdl: wsdl, endpoint: endpoint, otrs_user: otrs_user, 
-                otrs_passwd: otrs_passwd }.merge(basic_auth)
-              )
+    before(:each) do
+      @ticket = Ottick::Ticket.new({ 
+		  wsdl: wsdl, endpoint: endpoint, otrs_user: otrs_user, 
+		  otrs_passwd: otrs_passwd }.merge(basic_auth)
+		)
+    end
+
+    it "ticket_create returns some content" do
+      subject  = "Testticket from webservice"
+      text     = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+
+      response = @ticket.ticket_create(subject, text)
+      response.body.should include(:ticket_create_response)
+      ts = response.body[:ticket_create_response]
+      ts.should include(:ticket_id)
+      ts.should include(:article_id)
+      ts.should include(:ticket_number)
+
+      response = @ticket.ticket_get("TicketID" => ts[:ticket_id])
+      response.body[:ticket_get_response][:ticket].should include(:title)
+      response.body[:ticket_get_response][:ticket][:title].should == subject
+    end
+    
   end
 
-  it "ticket_create returns some content" do
-    subject  = "Testticket from webservice"
-    text     = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+  describe "with invalid settings" do
+    before(:each) do
+      @ticket = Ottick::Ticket.new()
+    end
 
-    response = @ticket.ticket_create(subject, text)
-    response.body.should include(:ticket_create_response)
-    ts = response.body[:ticket_create_response]
-    ts.should include(:ticket_id)
-    ts.should include(:article_id)
-    ts.should include(:ticket_number)
+    it "ticket.create should not raise errors" do
+      expect{ @ticket.create("subject", "body") }.not_to raise_error
+      expect( @ticket.create("subject", "body") ).to be_nil
+    end
 
-    response = @ticket.ticket_get("TicketID" => ts[:ticket_id])
-    response.body[:ticket_get_response][:ticket].should include(:title)
-    response.body[:ticket_get_response][:ticket][:title].should == subject
+    it "ticket.create should contain errors" do
+      @ticket.create("subject", "body")
+      expect{ @ticket.errors.any? }.to be_true
+      expect( @ticket.errors.join(',') ).to match(/Exception occurred:/)
+    end
   end
-  
 end

@@ -13,15 +13,15 @@ describe 'TicketGet' do
 
   it "ticket_get returns some content" do
     response = @ticket.ticket_get("TicketID" => ticket_get_id)
-    response.body.should include(:ticket_get_response)
-    response.body[:ticket_get_response].should include(:ticket)
+    expect(response.body).to include(:ticket_get_response)
+    expect(response.body[:ticket_get_response]).to include(:ticket)
     ticket = response.body[:ticket_get_response][:ticket]
-    ticket.should include(:queue, :queue_id, :create_by)
+    expect(ticket).to include(:queue, :queue_id, :create_by)
   end
 
   it "get returns some content" do
     response = @ticket.get("TicketID" => ticket_get_id)
-    response[:ticket].should include(:queue, :title)
+    expect(response[:ticket]).to include(:queue, :title)
   end
   
 end

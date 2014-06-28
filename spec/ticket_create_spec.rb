@@ -43,7 +43,7 @@ describe 'TicketCreate' do
 
     it "ticket.create should contain errors" do
       @ticket.create("subject", "body")
-      expect{ @ticket.errors.any? }.to be_true
+      expect(@ticket.errors.any?).to be_truthy
       expect( @ticket.errors.join(',') ).to match(/Exception occurred:/)
     end
   end

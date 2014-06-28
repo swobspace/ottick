@@ -4,7 +4,7 @@ require 'active_support/core_ext/hash'
 
 module Ottick
   class Ticket
-    attr_reader :options, :client
+    attr_reader :options, :client, :errors
 
     # Ticket.new(options)
     # for possible options see Savon.client()
@@ -15,23 +15,35 @@ module Ottick
       @otrs_credentials = otrs_credentials!(options)
       @options          = default_options.merge(options)
       @client           = Savon.client(@options)
+      @errors		= []
     end
 
     def get(options = {})
-      response = ticket_get(options)
-      if response.success? || response.soap_fault?
-        response.body[:ticket_get_response]
-      else
-        response.http
+      begin
+        response = ticket_get(options)
+        if response.success? || response.soap_fault?
+          response.body[:ticket_get_response]
+        else
+          @errors << response.http.to_s
+          nil
+        end
+      rescue Exception => e
+        @errors << "Exception occurred: " + e.to_s
+        nil
       end
     end
 
     def create(subject, text, options = {})
-      response = ticket_create(subject, text, options = {})
-      if response.success? || response.soap_fault?
-        response.body[:ticket_create_response]
-      else
-        response.http
+      begin
+	response = ticket_create(subject, text, options = {})
+	if response.success? || response.soap_fault?
+	  response.body[:ticket_create_response]
+	else
+	  @errors << response.http.to_s
+	end
+      rescue Exception => e
+        @errors << "Exception occurred: " + e.to_s
+        nil
       end
     end
 

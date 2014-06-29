@@ -73,14 +73,14 @@ module Ottick
 
     def ticket_create(subject, text, options = {})
       return if (subject.blank? || text.blank?)
-      ticket = create_ticket_opts!(options)
-      ticket.merge!("Title" => subject)
-      article = create_article_opts!(options)
-      article.merge!("Subject" => subject).merge!("Body" => text)
+      ticket_opts = create_ticket_opts!(options)
+      ticket_opts.merge!("Title" => subject)
+      article_opts = create_article_opts!(options)
+      article_opts.merge!("Subject" => subject).merge!("Body" => text)
 
       @client.call(:ticket_create,
-                    message: @otrs_credentials.merge("Ticket" => ticket).
-		             merge("Article" => article).merge(options))
+                    message: @otrs_credentials.merge("Ticket" => ticket_opts).
+		             merge("Article" => article_opts).merge(options))
     end
 
     private

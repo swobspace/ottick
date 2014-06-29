@@ -45,7 +45,7 @@ module Ottick
 
     def create(subject, text, options = {})
       begin
-	response = ticket_create(subject, text, options = {})
+	response = ticket_create(subject, text, options)
 	if response.success?
 	  @response = response.body[:ticket_create_response]
           if @response.include?(:ticket_id)

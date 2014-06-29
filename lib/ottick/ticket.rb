@@ -24,8 +24,14 @@ module Ottick
         response = ticket_get(options)
         if response.success?
           @response = response.body[:ticket_get_response]
+          if @response.include?(:ticket)
+            @response
+          else
+            @errors << "#{@response[:error][:error_code]} => #{@response[:error][:error_message]}"
+            nil
+          end
         elsif response.soap_fault?
-          @errors = response.body[:ticket_get_response].to_s
+          @errors << response.body.to_s
           nil
         else
           @errors << response.http.to_s
@@ -42,8 +48,14 @@ module Ottick
 	response = ticket_create(subject, text, options = {})
 	if response.success?
 	  @response = response.body[:ticket_create_response]
+          if @response.include?(:ticket_id)
+            @response
+          else
+            @errors << "#{@response[:error][:error_code]} => #{@response[:error][:error_message]}"
+            nil
+          end
         elsif response.soap_fault?
-          @errors = response.body[:ticket_get_response].to_s
+          @errors << response.body.to_s
           nil
 	else
 	  @errors << response.http.to_s

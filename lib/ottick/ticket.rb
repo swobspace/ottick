@@ -4,7 +4,7 @@ require 'active_support/core_ext/hash'
 
 module Ottick
   class Ticket
-    attr_reader :options, :client, :errors
+    attr_reader :options, :client, :errors, :response
 
     # Ticket.new(options)
     # for possible options see Savon.client()
@@ -16,13 +16,17 @@ module Ottick
       @options          = default_options.merge(options)
       @client           = Savon.client(@options)
       @errors		= []
+      @response		= nil
     end
 
     def get(options = {})
       begin
         response = ticket_get(options)
-        if response.success? || response.soap_fault?
-          response.body[:ticket_get_response]
+        if response.success?
+          @response = response.body[:ticket_get_response]
+        elsif response.soap_fault?
+          @errors = response.body[:ticket_get_response].to_s
+          nil
         else
           @errors << response.http.to_s
           nil
@@ -36,10 +40,14 @@ module Ottick
     def create(subject, text, options = {})
       begin
 	response = ticket_create(subject, text, options = {})
-	if response.success? || response.soap_fault?
-	  response.body[:ticket_create_response]
+	if response.success?
+	  @response = response.body[:ticket_create_response]
+        elsif response.soap_fault?
+          @errors = response.body[:ticket_get_response].to_s
+          nil
 	else
 	  @errors << response.http.to_s
+          nil
 	end
       rescue Exception => e
         @errors << "Exception occurred: " + e.to_s
@@ -58,18 +66,18 @@ module Ottick
       article = create_article_opts!(options)
       article.merge!("Subject" => subject).merge!("Body" => text)
 
-      @client.call(:ticket_create, 
+      @client.call(:ticket_create,
                     message: @otrs_credentials.merge("Ticket" => ticket).
 		             merge("Article" => article).merge(options))
     end
 
     private
- 
+
     def sanitize_options!(options)
       return if options.empty?
       options.symbolize_keys!
       if options.has_key?(:http_auth_user) or options.has_key?(:http_auth_passwd)
-        raise RuntimeError, 
+        raise RuntimeError,
               "please use basic_auth: ['user', 'passwd'] instead of" +
               ":http_auth_user and http_auth_passwd"
       end
@@ -82,7 +90,7 @@ module Ottick
         "Password"  => otrs_cred.fetch(:otrs_passwd, Ottick.otrs_passwd)
       }
     end
- 
+
     def default_options
       default_basic_options.merge(default_http_authentication)
     end
@@ -107,7 +115,7 @@ module Ottick
     def create_ticket_opts!(options)
       ticket_opts = options.extract!("Ticket")
       sanitize_ticket_opts!(ticket_opts)
-      { 
+      {
 	"Queue"	=> Ottick.ticket_queue,
 	"State"	=> Ottick.ticket_state,
 	"Type"	=> Ottick.ticket_type,

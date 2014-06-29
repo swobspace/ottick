@@ -22,6 +22,7 @@ describe 'TicketGet' do
   it "get returns some content" do
     response = @ticket.get("TicketID" => ticket_get_id)
     expect(response[:ticket]).to include(:queue, :title)
+    expect(@ticket.response[:ticket]).to include(:queue, :title)
   end
   
 end

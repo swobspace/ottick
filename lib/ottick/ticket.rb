@@ -126,6 +126,7 @@ module Ottick
 
     def create_ticket_opts!(options)
       ticket_opts = options.extract!("Ticket")
+      ticket_opts = ticket_opts.nil? ? {} : ticket_opts.fetch("Ticket", {})
       sanitize_ticket_opts!(ticket_opts)
       {
 	"Queue"	=> Ottick.ticket_queue,
@@ -138,6 +139,7 @@ module Ottick
 
     def create_article_opts!(options)
       article_opts = options.extract!("Article")
+      article_opts = article_opts.nil? ? {} : article_opts.fetch("Article", {})
       sanitize_article_opts!(article_opts)
       {
 	"SenderType" => Ottick.article_sender_type,

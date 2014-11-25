@@ -13,7 +13,7 @@ Installation
 ------------
 
 ```ruby
-gem 'ottick', git: https://github.com/swobspace/ottick.git, branch: "master"
+gem 'ottick', git: "https://github.com/swobspace/ottick.git", branch: "master"
 ```
 
 Configuration

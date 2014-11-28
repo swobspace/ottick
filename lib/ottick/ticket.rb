@@ -78,6 +78,7 @@ module Ottick
     #   'Subject of the Article',
     #   'Content of the Article',
     #   {
+    #     # end the line below with a "," if you're using the optional settings
     #     'TicketID' => 1, # OR 'TicketNumber' => 2010080210123456
     #     #OPTIONAL START#
     #     'Article' => {

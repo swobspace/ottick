@@ -1,4 +1,4 @@
-  require 'savon'
+require 'savon'
 require 'active_support/core_ext/object/blank'
 require 'active_support/core_ext/hash'
 
@@ -15,11 +15,10 @@ module Ottick
       @otrs_credentials = otrs_credentials!(options)
       @options          = default_options.merge(options)
       @client           = Savon.client(@options)
-      @errors		= []
-      @response		= nil
+      @errors           = []
+      @response         = nil
     end
 
-    #
     def get(options = {})
       begin
         response = ticket_get(options)
@@ -46,9 +45,9 @@ module Ottick
 
     def create(subject, text, options = {})
       begin
-	      response = ticket_create(subject, text, options)
-	      if response.success?
-	        @response = response.body[:ticket_create_response]
+        response = ticket_create(subject, text, options)
+        if response.success?
+          @response = response.body[:ticket_create_response]
           if @response.include?(:ticket_id)
             @response
           else
@@ -59,9 +58,9 @@ module Ottick
           @errors << response.body.to_s
           nil
         else
-	        @errors << response.http.to_s
+          @errors << response.http.to_s
           nil
-	      end
+        end
       rescue Exception => e
         @errors << "Exception occurred: " + e.to_s
         nil
@@ -200,9 +199,9 @@ module Ottick
 
     def default_basic_options
       {
-        wsdl: 	     Ottick.wsdl,
-        endpoint:    Ottick.endpoint,
-        env_namespace: :soapenv,
+        wsdl:                    Ottick.wsdl,
+        endpoint:                Ottick.endpoint,
+        env_namespace:           :soapenv,
         convert_request_keys_to: :camelcase
       }
     end
@@ -220,11 +219,11 @@ module Ottick
       ticket_opts = ticket_opts.nil? ? {} : ticket_opts.fetch("Ticket", {})
       sanitize_ticket_opts!(ticket_opts)
       {
-      	"Queue"	=> Ottick.ticket_queue,
-      	"State"	=> Ottick.ticket_state,
-      	"Type"	=> Ottick.ticket_type,
-      	"Priority" => Ottick.ticket_priority,
-      	"CustomerUser" => Ottick.customer_user
+        "Queue"        => Ottick.ticket_queue,
+        "State"        => Ottick.ticket_state,
+        "Type"         => Ottick.ticket_type,
+        "Priority"     => Ottick.ticket_priority,
+        "CustomerUser" => Ottick.customer_user
       }.merge(ticket_opts)
     end
 
@@ -233,9 +232,9 @@ module Ottick
       article_opts = article_opts.nil? ? {} : article_opts.fetch("Article", {})
       sanitize_article_opts!(article_opts)
       {
-      	"SenderType" => Ottick.article_sender_type,
-      	"Charset"    => Ottick.article_charset,
-      	"MimeType"   => Ottick.article_mime_type
+        "SenderType" => Ottick.article_sender_type,
+        "Charset"    => Ottick.article_charset,
+        "MimeType"   => Ottick.article_mime_type
       }.merge(article_opts)
     end
 

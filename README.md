@@ -49,10 +49,10 @@ puts found.inspect
 # returns
 # {
 #   :ticket=>{
-#     :age=>"435004", :archive_flag=>"n", :change_by=>"2", 
-#     :changed=>"2014-05-20 17:23:48", :create_by=>"2", 
-#     :create_time_unix=>"1400599428", :created=>"2014-05-20 17:23:48", 
-#     :customer_id=>"1234", :customer_user_id=>"...", 
+#     :age=>"435004", :archive_flag=>"n", :change_by=>"2",
+#     :changed=>"2014-05-20 17:23:48", :create_by=>"2",
+#     :create_time_unix=>"1400599428", :created=>"2014-05-20 17:23:48",
+#     :customer_id=>"1234", :customer_user_id=>"...",
 #     :escalation_response_time=>"0", :escalation_solution_time=>"0",
 #     :escalation_time=>"0", :escalation_update_time=>"0",
 #     :group_id=>"20", :lock=>"lock", :lock_id=>"2", :owner=>"otrs",
@@ -71,13 +71,35 @@ puts found.inspect
 created = @ticket.create("Subject and title", "message body")
 puts created.inspect
 # returns
-# { 
+# {
 #   :ticket_id => 1234567,
 #   :article_id => 5678,
 #   :ticket_number => 4711,
 #   :@xmlns=>"http://www.otrs.org/TicketConnector/"
 # }
-    
+
+result = @ticket.add_article(
+  'Subject of the Article',
+  'Content of the Article',
+  {
+    'TicketID' => 1, # OR 'TicketNumber' => 2010080210123456
+    #OPTIONAL START#
+    'Article' => {
+      'ArticleType' => 'note-internal',
+      'OtherArticleOption' => 'value'
+    }
+    #OPTIONAL END#
+  }
+)
+puts result.inspect
+# returns
+# {
+#   :article_id    => "5678",
+#   :ticket_id     => "1234567",
+#   :ticket_number => "2010080210123456",
+#   :@xmlns        => "http://www.otrs.org/TicketConnector/"
+# }
+
 ```
 
 Licence

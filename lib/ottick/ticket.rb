@@ -147,8 +147,9 @@ module Ottick
           if @response.include?(:ticket_id)
             # Return the response
             @response
-          elsif @response.nil?
+          elsif !@response.include?(:error)
             @errors << 'No results for given options'
+            nil
 
           # Error handling
           # use `.errors` to see if any errors occurred.

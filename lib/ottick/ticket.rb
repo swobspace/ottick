@@ -147,9 +147,6 @@ module Ottick
           if @response.include?(:ticket_id)
             # Return the response
             @response
-          elsif !@response.include?(:error)
-            @errors << 'No results for given options'
-            nil
 
           # Error handling
           # use `.errors` to see if any errors occurred.
@@ -158,7 +155,11 @@ module Ottick
           # otrs_ticket = Ottick::Ticket.new()
           # otrs_ticket.search( #params# )
           # otrs_ticket.errors
-          #
+
+          # if no error is pressent there are no search results
+          elsif !@response.include?(:error)
+            @errors << 'No results for given options'
+            nil
           # This will return an array with errors if there are any.
           # Otherwise it will return an empty array.
           else

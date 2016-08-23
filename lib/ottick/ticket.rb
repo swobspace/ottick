@@ -132,6 +132,8 @@ module Ottick
     # http://otrs.github.io/doc/manual/admin/stable/en/html/genericinterface.html#genericinterface-connectors
     #
     # Example:
+    # search('TicketNumber' => 100100)
+    # => {:ticket_id=>"99", :@xmlns=>"http://www.otrs.org/TicketConnector"}
     def search(options = {})
       begin
         # Call `ticket_search` to check the given parameters and create a
@@ -145,6 +147,8 @@ module Ottick
           if @response.include?(:ticket_id)
             # Return the response
             @response
+          elsif @response.nil?
+            @errors << 'No results for given options'
 
           # Error handling
           # use `.errors` to see if any errors occurred.

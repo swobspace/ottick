@@ -128,6 +128,51 @@ module Ottick
       end
     end
 
+    # Search an article based on options given in:
+    # http://otrs.github.io/doc/manual/admin/stable/en/html/genericinterface.html#genericinterface-connectors
+    #
+    # Example:
+    def search(options = {})
+      begin
+        # Call `ticket_search` to check the given parameters and create a
+        # SOAP request using savon.
+        response = ticket_search(options)
+        # Check if the the response is successful.
+        if response.success?
+          # Strip from unusefull information
+          @response = response.body[:ticket_search_response]
+          # Check if the response contains an ticked id.
+          if @response.include?(:ticket_id)
+            # Return the response
+            @response
+
+          # Error handling
+          # use `.errors` to see if any errors occurred.
+          #
+          # example:
+          # otrs_ticket = Ottick::Ticket.new()
+          # otrs_ticket.search( #params# )
+          # otrs_ticket.errors
+          #
+          # This will return an array with errors if there are any.
+          # Otherwise it will return an empty array.
+          else
+            @errors << "#{@response[:error][:error_code]} => #{@response[:error][:error_message]}"
+            nil
+          end
+        elsif response.soap_fault?
+          @errors << response.body.to_s
+          nil
+        else
+          @errors << response.http.to_s
+          nil
+        end
+      rescue Exception => e
+        @errors << "Exception occurred: " + e.to_s
+        nil
+      end
+    end
+
     def ticket_get(options = {})
       @client.call(:ticket_get, message: @otrs_credentials.merge(options))
     end
@@ -171,6 +216,10 @@ module Ottick
           merge( 'Article' => article_opts ).
           merge( options )
       )
+    end
+
+    def ticket_search(options = {})
+      @client.call(:ticket_search, message: @otrs_credentials.merge(options))
     end
 
     private
